@@ -1,6 +1,6 @@
-import { Schema, Model } from "mongoose";
+import mongoose, { Schema, Model } from "mongoose";
 
-const todoSchema = new Schema({
+const todoSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
@@ -9,11 +9,9 @@ const todoSchema = new Schema({
     type: String,
     required: true,
   },
-  date: {
-    type: Date,
-  },
-  time: {
-    type: String,
+  completed: {
+    type: Boolean,
+    default: false,
   },
   user: {
     type: Schema.Types.ObjectId,
