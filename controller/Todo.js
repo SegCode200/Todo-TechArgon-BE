@@ -13,19 +13,30 @@ export const createTodo = async (req, res) => {
         .json({ message: "Please provide title and content" });
     }
     const existinguser = await userModel.findById({ _id: userId });
-    if (!existinguser) {
+    if (
+      !existinguser ||
+      existinguser.isVerified === false ||
+      existinguser.token !== null
+    ) {
       return res
         .status(StatusCode.NOT_FOUND)
         .json({ message: "User not found" });
     }
-    const newTodo = await todoModel.create({ title: title, content: content });
+    const userdetails = new mongoose.Types.ObjectId(existinguser._id);
+    const newTodo = await todoModel.create({
+      title: title,
+      content: content,
+      user: userdetails,
+    });
     if (!newTodo) {
       return res
         .status(StatusCode.INTERNAL_SERVER_ERROR)
         .json({ message: "Failed to create todo" });
     }
-    newTodo.user(new mongoose.Types.ObjectId(newTodo._id));
-    existinguser.todos(new mongoose.Types.ObjectId(user._id));
+    const todoId = new mongoose.Types.ObjectId(newTodo._id);
+
+    existinguser.todos.push(todoId);
+    await existinguser.save();
     await newTodo.save();
     return res
       .status(StatusCode.CREATED)
@@ -70,7 +81,7 @@ export const getUserTodo = async (req, res) => {
         .status(StatusCode.FIELD_REQUIRED)
         .json({ message: "Please provide user ID" });
     }
-    const user = await todoModel.find({ _id: userId }).populate("todos");
+    const user = await userModel.find({ _id: userId }).populate("todos");
     if (!user) {
       return res
         .status(StatusCode.NOT_FOUND)
@@ -80,6 +91,7 @@ export const getUserTodo = async (req, res) => {
       .status(StatusCode.OK)
       .json({ message: "User found", data: user });
   } catch (error) {
+    console.log(error);
     return res
       .status(StatusCode.INTERNAL_SERVER_ERROR)
       .json({ message: "Something went wrong" });

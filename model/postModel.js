@@ -14,7 +14,7 @@ const todoSchema = new mongoose.Schema({
     default: false,
   },
   user: {
-    type: Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
 });

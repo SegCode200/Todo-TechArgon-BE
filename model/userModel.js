@@ -24,8 +24,8 @@ const userSchema = new mongoose.Schema(
     },
     todos: [
       {
-        type: Schema.Types.ObjectId,
-        ref: "Post",
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Todo",
       },
     ],
   },
